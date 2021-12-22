@@ -1,0 +1,41 @@
+package com.example.recepie.recepieapp.controller;
+
+import com.example.recepie.recepieapp.commands.RecipeCommand;
+import com.example.recepie.recepieapp.service.RecepieService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class RecipeController {
+
+    private final RecepieService recepieService;
+
+    public RecipeController(RecepieService recepieService) {
+        this.recepieService = recepieService;
+    }
+
+    @RequestMapping("/recipe/show/{id}")
+    public String showById(@PathVariable String id, Model model){
+        model.addAttribute("recipe", recepieService.findById(Long.valueOf(id)));
+        return "recipe/show";
+    }
+
+    @RequestMapping("recipe/new")
+    public String newRecipe(Model model){
+        model.addAttribute("recipe", new RecipeCommand());
+
+        return "recipe/recipeform";
+    }
+
+    @PostMapping("recipe")
+    public String saveOrUpdate(@ModelAttribute RecipeCommand command){
+        RecipeCommand savedCommand = recepieService.saveRecipeCommand(command);
+
+        return "redirect:/recipe/show/" + savedCommand.getId();
+    }
+
+}
